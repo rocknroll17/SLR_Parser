@@ -9,10 +9,10 @@ class Token:
         self.value = value
 
     def __repr__(self):
-        return f'{self.type}, {self.value}'
+        return f'{self.type}'
     
     def __str__(self):
-        return f'{self.type}, {self.value}'
+        return f'{self.type}'
     
     def to_string(self, option=VALUE):
         if option == VALUE:
