@@ -12,8 +12,6 @@ for i in range(1, 150):
     if pd.isna(df.iat[i, 0]):
         break
     value = int(df.iat[i, 0])
-
-    print(value)
     action_row = []
     goto_row = []
     for j in range(1, 23):
@@ -40,5 +38,5 @@ for i in range(len(action)):
     goto_str = '"GOTO":{' + ','.join([f'"{key}":{value}' for key, value in goto[i]]) + '}'
     result_str = f'{{{action_str}, {goto_str}}}'
     results.append(result_str)
-final_output = '[' + ',\n'.join(results) + ']'
+final_output = '[\n' + ',\n'.join(results) + '\n]'
 print(final_output)

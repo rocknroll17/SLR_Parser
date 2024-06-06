@@ -14,7 +14,7 @@ class SLRParser:
         i = 0
         string = []
         while True:
-            time.sleep(1.5)
+            time.sleep(1)
             state = stack[-1]
             token = input[i].type
             action = self.table[state]["ACTION"][token]
@@ -33,15 +33,19 @@ class SLRParser:
                 i += 1
             elif action[0] == "R":
                 rule_index = int(action[1:])
-                for j in range(len(self.rule[rule_index][1])):
-                    string.pop()
-                    stack.pop()
+                if self.rule[rule_index][1][0] == "ϵ":
+                    string.append(Token(self.rule[rule_index][0], ""))
+                else:
+                    for j in range(len(self.rule[rule_index][1])):
+                        string.pop()
+                        stack.pop()
                 string.append(Token(self.rule[rule_index][0], ""))
                 state = stack[-1]
                 token = string[-1].type
                 stack.append(self.table[state]["GOTO"][token])
             else:
                 return False
+
             
 
 rule = [
@@ -83,7 +87,7 @@ rule = [
 
 table = [
     {"ACTION":{"vtype":"S4","$":"R3"}, "GOTO":{"CODE":1,"VDECL":2,"FDECL":3}},
-    {"ACTION":{"$":"ACCc"}, "GOTO":{}},
+    {"ACTION":{"$":"ACC"}, "GOTO":{}},
     {"ACTION":{"vtype":"S4","$":"R3"}, "GOTO":{"CODE":5,"VDECL":2,"FDECL":3}},
     {"ACTION":{"vtype":"S4","$":"R3"}, "GOTO":{"CODE":6,"VDECL":2,"FDECL":3}},
     {"ACTION":{"id":"S7"}, "GOTO":{"ASSIGN":8}},
@@ -159,3 +163,6 @@ table = [
     {"ACTION":{"rbrace":"S75"}, "GOTO":{}},
     {"ACTION":{"vtype":"R31","id":"R31","rbrace":"R31","if":"R31","while":"R31","return":"R31"}, "GOTO":{}}
 ]
+
+if __name__ == "__main__":
+    import main
