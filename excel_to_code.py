@@ -4,12 +4,15 @@ import pandas as pd
 df = pd.read_excel('table.xlsx')
 
 # 원하는 특정 위치 조회 (예: A1 셀)
-value = df.iat[0, 1]
+value = df.iat[1, 0]
 print(value)
 action = []
 goto = []
-for i in range(1, 81):
+for i in range(1, 150):
+    if pd.isna(df.iat[i, 0]):
+        break
     value = int(df.iat[i, 0])
+
     print(value)
     action_row = []
     goto_row = []
@@ -18,7 +21,7 @@ for i in range(1, 81):
         value = df.iat[i, j]
         if pd.isna(value):
             continue
-        value = value.replace("s", "S").replace("r", "R").replace("ac", "ACC")
+        value = value.replace("s", "S").replace("r", "R").replace("acc", "ACC")
         action_row.append((key, value))
     for j in range(23, 39):
         key = df.iat[0, j]
