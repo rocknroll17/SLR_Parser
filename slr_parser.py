@@ -1,6 +1,7 @@
 from lexical_analyzer import Token
 import time
 import lexical_analyzer
+from tree import Tree
 
 
 class SLRParser:
@@ -13,8 +14,9 @@ class SLRParser:
         input = input + [Token("$", "$")]
         i = 0
         string = []
+        tree = []
         while True:
-            time.sleep(1)
+            time.sleep(0.07)
             state = stack[-1]
             token = input[i].type
             action = self.table[state]["ACTION"][token]
@@ -26,20 +28,28 @@ class SLRParser:
             print("토큰:",token, "action:",action)
             print()
             if action == "ACC":
+                tree_node = Tree(self.rule[0][0])
+                for j in range(len(tree)):
+                    tree_node.add_child(tree[j], 0)
+                tree = tree_node
+                tree.print_tree_by_level()
                 return True
             elif action[0] == "S":
                 stack.append(int(action[1:]))
                 string.append(input[i].type)
+                tree.append(Tree(input[i].type))
                 i += 1
             elif action[0] == "R":
                 rule_index = int(action[1:])
-                if self.rule[rule_index][1][0] == "ϵ":
-                    string.append(Token(self.rule[rule_index][0], ""))
-                else:
+                if self.rule[rule_index][1][0] != "ϵ":
                     for j in range(len(self.rule[rule_index][1])):
                         string.pop()
                         stack.pop()
+                    tree_node = Tree(self.rule[rule_index][0])
+                    for j in range(len(self.rule[rule_index][1])):
+                        tree_node.add_child(tree.pop(), 0)
                 string.append(Token(self.rule[rule_index][0], ""))
+                tree.append(tree_node)
                 state = stack[-1]
                 token = string[-1].type
                 stack.append(self.table[state]["GOTO"][token])
