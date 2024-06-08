@@ -2,6 +2,7 @@ from lexical_analyzer import Token
 import time
 import lexical_analyzer
 from tree import Tree
+from anytree import Node, RenderTree
 
 
 class SLRParser:
@@ -14,6 +15,7 @@ class SLRParser:
         input = input + [Token("$", "$")]
         i = 0
         string = []
+        any_tree = []
         tree = []
         while True:
             time.sleep(0.07)
@@ -23,21 +25,29 @@ class SLRParser:
             print("input:",input)
             print("스택:",stack)
             print("LEFT:",string)
+            print("TREE:",tree)
             print("현재 input:",input[i])
             print("남은 input:",input[i:])
             print("토큰:",token, "action:",action)
+            print("AnyTree:", any_tree)
             print()
             if action == "ACC":
                 tree_node = Tree(self.rule[0][0])
+                any_tree_node = Node(self.rule[0][0])
                 for j in range(len(tree)):
                     tree_node.add_child(tree[j], 0)
+                    any_tree_node.children = any_tree
                 tree = tree_node
+                any_tree = any_tree_node
+                for pre, fill, node in RenderTree(any_tree):
+                    print("%s%s" % (pre, node.name))
                 tree.print_tree_by_level()
                 return True
             elif action[0] == "S":
                 stack.append(int(action[1:]))
                 string.append(input[i].type)
                 tree.append(Tree(input[i].type))
+                any_tree.append(Node(input[i].type))
                 i += 1
             elif action[0] == "R":
                 rule_index = int(action[1:])
@@ -46,19 +56,31 @@ class SLRParser:
                         string.pop()
                         stack.pop()
                     tree_node = Tree(self.rule[rule_index][0])
+                    any_tree_node = Node(self.rule[rule_index][0])
                     for j in range(len(self.rule[rule_index][1])):
-                        tree_node.add_child(tree.pop(), 0)
+                        tree_node.children.insert(0, tree.pop())
+                    any_tree_node.children = any_tree[-len(self.rule[rule_index][1]):]
+                    any_tree = any_tree[:-len(self.rule[rule_index][1])]
+                else:
+                    tree_node = Tree(self.rule[rule_index][0])
+                    any_tree_node = Node(self.rule[rule_index][0])
+
                 string.append(Token(self.rule[rule_index][0], ""))
                 tree.append(tree_node)
+                any_tree.append(any_tree_node)
                 state = stack[-1]
                 token = string[-1].type
                 stack.append(self.table[state]["GOTO"][token])
+                for j in any_tree:
+                    for pre, fill, node in RenderTree(j):
+                        print("%s%s" % (pre, node.name))
             else:
                 return False
 
             
 
 rule = [
+
     ["S", ["CODE"]],
     ["CODE", ['VDECL', 'CODE']],
     ["CODE", ['FDECL', 'CODE']],
