@@ -3,6 +3,7 @@ class Tree:
         self.value = value
         self.children = []
         self.parent = None
+        self.level = None
         
     def __str__(self):
         return str(self.value)
@@ -26,10 +27,17 @@ class Tree:
     def get_parent(self):
         return self.parent
     
+    def set_parent(self):
+        for i in self.children:
+            i.parent = self
+            i.set_parent()
+    def set_level(self, level):
+        self.level = level
+        for i in self.children:
+            i.set_level(level+1)
     def print_tree_by_level(self):
         if not self:
             return
-        
         current_level = [self]
         
         while current_level:
@@ -39,3 +47,26 @@ class Tree:
                 next_level.extend(node.get_children())
             print()
             current_level = next_level
+
+    def print_tree(self, indent=0):
+        indentation = ""
+        me = self
+        parent = self.parent
+        while parent:
+            if parent.children.index(me) < len(parent.children) - 1:
+                indentation = "│   " + indentation
+            elif parent.children.index(me) == len(parent.children) - 1:
+                indentation = "    " + indentation
+            else:
+                indentation = "    " + indentation
+            me = parent
+            parent = parent.parent
+        if self.parent != None:
+            if self.parent.children.index(self) < len(self.parent.children) - 1:
+                print(indentation + "├───" + self.value)
+            else:
+                print(indentation + "└───" + self.value)
+        else:
+            print(self.value)
+        for child in self.children:
+            child.print_tree(indent + 1)

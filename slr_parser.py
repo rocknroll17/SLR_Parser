@@ -18,7 +18,7 @@ class SLRParser:
         any_tree = []
         tree = []
         while True:
-            time.sleep(0.07)
+            time.sleep(0.03)
             state = stack[-1]
             token = input[i].type
             action = self.table[state]["ACTION"][token]
@@ -38,10 +38,13 @@ class SLRParser:
                     tree_node.add_child(tree[j], 0)
                     any_tree_node.children = any_tree
                 tree = tree_node
+                tree.set_parent()
+                tree.set_level(1)
                 any_tree = any_tree_node
                 for pre, fill, node in RenderTree(any_tree):
                     print("%s%s" % (pre, node.name))
                 tree.print_tree_by_level()
+                tree.print_tree()
                 return True
             elif action[0] == "S":
                 stack.append(int(action[1:]))
