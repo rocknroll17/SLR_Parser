@@ -18,7 +18,6 @@ class SLRParser:
         any_tree = []
         tree = []
         while True:
-            time.sleep(0.03)
             state = stack[-1]
             token = input[i].type
             action = self.table[state]["ACTION"][token]

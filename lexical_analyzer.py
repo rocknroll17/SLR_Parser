@@ -37,7 +37,7 @@ class Lexical_analyzer:
             ('addsub', r'[+-]'),
             ('multdiv', r'[*/]'),
             ('assign', r'='),
-            ('comp', r'==|!=|<=|>=|<|>'),
+            ('comp', r'==|!=|<=|>=|<|>|&&|\|\|'),
             ('semi', r';'),
             ('comma', r','),
             ('lparen', r'\('),

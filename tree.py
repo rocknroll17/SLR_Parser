@@ -52,8 +52,12 @@ class Tree:
         indentation = ""
         me = self
         parent = self.parent
-        while parent:
-            if parent.children.index(me) < len(parent.children) - 1:
+        for i in range(indent):
+            if i == 0 and self.parent.children.index(self) < len(self.parent.children) - 1:
+                indentation = "├───" + indentation
+            elif i == 0  and self.parent.children.index(self) == len(self.parent.children) - 1:
+                indentation = "└───" + indentation
+            elif parent.children.index(me) < len(parent.children) - 1:
                 indentation = "│   " + indentation
             elif parent.children.index(me) == len(parent.children) - 1:
                 indentation = "    " + indentation
@@ -61,12 +65,7 @@ class Tree:
                 indentation = "    " + indentation
             me = parent
             parent = parent.parent
-        if self.parent != None:
-            if self.parent.children.index(self) < len(self.parent.children) - 1:
-                print(indentation + "├───" + self.value)
-            else:
-                print(indentation + "└───" + self.value)
         else:
-            print(self.value)
+            print(indentation + str(self.value))
         for child in self.children:
             child.print_tree(indent + 1)
