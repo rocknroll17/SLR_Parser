@@ -1,0 +1,6 @@
+char function(int a){
+    while(true && true){
+        a = a+1;
+    }
+    return c;
+}

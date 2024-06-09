@@ -49,20 +49,21 @@ class Lexical_analyzer:
         
     def tokenize(self, code):
         tok_regex = '|'.join(f'(?P<{pair[0]}>{pair[1]})' for pair in self.token_specification)
+        #Join rules into regex ex) vtype|id|num|literal...
         get_token = re.compile(tok_regex).match
-        # Tokenize function
+        #Tokenizing the code
         line_num = 1
         line_start = 0
-        mo = get_token(code)
+        current_token_match = get_token(code)
         tokens = []
         recognized_code_list = []
             
-        while mo is not None:
-            kind = mo.lastgroup
-            value = mo.group(kind)
+        while current_token_match is not None:
+            kind = current_token_match.lastgroup
+            value = current_token_match.group(kind)
             
             if kind == 'NEWLINE':
-                line_start = mo.end()
+                line_start = current_token_match.end()
                 line_num += 1
             elif kind == 'SKIP':
                 pass
@@ -70,10 +71,10 @@ class Lexical_analyzer:
                 raise RuntimeError(f'{value!r} unexpected on line {line_num}')
             else:
                 if kind != 'SKIP' and kind != 'NEWLINE':
-                    column = mo.start() - line_start
+                    column = current_token_match.start() - line_start
                     tokens.append(Token(kind, value))
             recognized_code_list.append(value)
-            mo = get_token(code, mo.end())
+            current_token_match = get_token(code, current_token_match.end())
         code_list = []
         temp = []
         for i in range(len(recognized_code_list)):

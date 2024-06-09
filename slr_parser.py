@@ -1,8 +1,6 @@
 from lexical_analyzer import Token
-import time
 import lexical_analyzer
 from tree import Tree
-from anytree import Node, RenderTree
 
 
 class SLRParser:
@@ -15,83 +13,81 @@ class SLRParser:
         input = input + [Token("$", "$")]
         i = 0
         string = []
-        any_tree = []
         tree = []
         while True:
             try:
                 state = stack[-1]
                 token = input[i].type
                 action = self.table[state]["ACTION"][token]
-                print("input:",input)
+                """print("input:",input)
                 print("스택:",stack)
                 print("LEFT:",string)
                 print("TREE:",tree)
                 print("현재 input:",input[i])
                 print("남은 input:",input[i:])
                 print("토큰:",token, "action:",action)
-                print("AnyTree:", any_tree)
-                print()
-                if action == "ACC":
+                print()"""#for debugging
+                if action == "ACC":#if accepted
                     tree_node = Tree(self.rule[0][0])
-                    any_tree_node = Node(self.rule[0][0])
                     for j in range(len(tree)):
                         tree_node.add_child(tree[j], 0)
-                        any_tree_node.children = any_tree
+                        #set S and all the nodes in list as children of the S node
                     tree = tree_node
                     tree.set_parent()
+                    #set the parent of all the nodes recursively
                     tree.set_level(1)
-                    any_tree = any_tree_node
-                    for pre, fill, node in RenderTree(any_tree):
-                        print("%s%s" % (pre, node.name))
+                    #set the level of all the nodes recursively
                     tree.print_tree()
-                    print("Accept")
+                    print("\nAccept")
                     return True
-                elif action[0] == "S":
+                elif action[0] == "S":#Shift
                     stack.append(int(action[1:]))
                     string.append(input[i].type)
                     tree.append(Tree(input[i].type))
-                    any_tree.append(Node(input[i].type))
                     i += 1
-                elif action[0] == "R":
+                elif action[0] == "R":#Reduce
                     rule_index = int(action[1:])
                     if self.rule[rule_index][1][0] != "ϵ":
                         for j in range(len(self.rule[rule_index][1])):
                             string.pop()
                             stack.pop()
+                            #pop the stack and the string as many as the number of elements in the rule
                         tree_node = Tree(self.rule[rule_index][0])
-                        any_tree_node = Node(self.rule[rule_index][0])
                         for j in range(len(self.rule[rule_index][1])):
                             tree_node.children.insert(0, tree.pop())
-                        any_tree_node.children = any_tree[-len(self.rule[rule_index][1]):]
-                        any_tree = any_tree[:-len(self.rule[rule_index][1])]
+                            #set the children of the node as the elements in the tree list as many as the number of elements in the rule
                     else:
                         tree_node = Tree(self.rule[rule_index][0])
-                        any_tree_node = Node(self.rule[rule_index][0])
+                        tree_node.add_child(Tree("ϵ"))
+                        #if the rule is epsilon, set the node as the rule
 
                     string.append(Token(self.rule[rule_index][0], ""))
                     tree.append(tree_node)
-                    any_tree.append(any_tree_node)
                     state = stack[-1]
                     token = string[-1].type
                     stack.append(self.table[state]["GOTO"][token])
-                else:
+                    #push the state and the token to the stack
+                else:#if the action is invalid, reject
                     print("Reject")
                     print("Invalid Rule")
                     return False
-            except:
-                print("Reject")
+            except:#if the invalid syntax is detected, reject with error handling
+                print("\nReject")
                 index = 0
                 print()
                 if additional == None:
+                    #this mode is used with "syntax_analyzer.py" <-- original one
                     for j in range(len(input)):
                         print(input[j].type, end=" ")
                     for j in range(i):
                         index += len(input[j].type) + 1
+                    #find the index of the invalid syntax
                     print()
                     print(" "*index, end = "")
                     print("^"*len(input[i].type))
                     print("Syntax Error: Invalid Syntax at line \""+ input[i].type+"\"")
-                else:
+                else:#if the additional list is given, print the line of the code where the invalid syntax is detected
+                    #this mode is used with "syntax_analyzer_code.py"
                     index = i
                     finder = 0
                     sum = 0
@@ -109,7 +105,7 @@ class SLRParser:
                 return False
 
             
-
+#The rules
 rule = [
     ["S", ["CODE"]],
     ["CODE", ['VDECL', 'CODE']],
@@ -147,6 +143,7 @@ rule = [
     ["RETURN", ['return', 'RHS', 'semi']]
     ]
 
+#The table
 table = [
     {"ACTION":{"vtype":"S4","$":"R3"}, "GOTO":{"CODE":1,"VDECL":2,"FDECL":3}},
     {"ACTION":{"$":"ACC"}, "GOTO":{}},
