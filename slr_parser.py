@@ -10,7 +10,7 @@ class SLRParser:
         self.table = table
         self.rule = rule
 
-    def parse(self, input):
+    def parse(self, input, additional = None):
         stack = [0]
         input = input + [Token("$", "$")]
         i = 0
@@ -18,65 +18,104 @@ class SLRParser:
         any_tree = []
         tree = []
         while True:
-            state = stack[-1]
-            token = input[i].type
-            action = self.table[state]["ACTION"][token]
-            print("input:",input)
-            print("스택:",stack)
-            print("LEFT:",string)
-            print("TREE:",tree)
-            print("현재 input:",input[i])
-            print("남은 input:",input[i:])
-            print("토큰:",token, "action:",action)
-            print("AnyTree:", any_tree)
-            print()
-            if action == "ACC":
-                tree_node = Tree(self.rule[0][0])
-                any_tree_node = Node(self.rule[0][0])
-                for j in range(len(tree)):
-                    tree_node.add_child(tree[j], 0)
-                    any_tree_node.children = any_tree
-                tree = tree_node
-                tree.set_parent()
-                tree.set_level(1)
-                any_tree = any_tree_node
-                for pre, fill, node in RenderTree(any_tree):
-                    print("%s%s" % (pre, node.name))
-                tree.print_tree_by_level()
-                tree.print_tree()
-                return True
-            elif action[0] == "S":
-                stack.append(int(action[1:]))
-                string.append(input[i].type)
-                tree.append(Tree(input[i].type))
-                any_tree.append(Node(input[i].type))
-                i += 1
-            elif action[0] == "R":
-                rule_index = int(action[1:])
-                if self.rule[rule_index][1][0] != "ϵ":
-                    for j in range(len(self.rule[rule_index][1])):
-                        string.pop()
-                        stack.pop()
-                    tree_node = Tree(self.rule[rule_index][0])
-                    any_tree_node = Node(self.rule[rule_index][0])
-                    for j in range(len(self.rule[rule_index][1])):
-                        tree_node.children.insert(0, tree.pop())
-                    any_tree_node.children = any_tree[-len(self.rule[rule_index][1]):]
-                    any_tree = any_tree[:-len(self.rule[rule_index][1])]
-                else:
-                    tree_node = Tree(self.rule[rule_index][0])
-                    any_tree_node = Node(self.rule[rule_index][0])
-
-                string.append(Token(self.rule[rule_index][0], ""))
-                tree.append(tree_node)
-                any_tree.append(any_tree_node)
+            try:
                 state = stack[-1]
-                token = string[-1].type
-                stack.append(self.table[state]["GOTO"][token])
-                for j in any_tree:
-                    for pre, fill, node in RenderTree(j):
+                token = input[i].type
+                action = self.table[state]["ACTION"][token]
+                print("input:",input)
+                print("스택:",stack)
+                print("LEFT:",string)
+                print("TREE:",tree)
+                print("현재 input:",input[i])
+                print("남은 input:",input[i:])
+                print("토큰:",token, "action:",action)
+                print("AnyTree:", any_tree)
+                print()
+                if action == "ACC":
+                    tree_node = Tree(self.rule[0][0])
+                    any_tree_node = Node(self.rule[0][0])
+                    for j in range(len(tree)):
+                        tree_node.add_child(tree[j], 0)
+                        any_tree_node.children = any_tree
+                    tree = tree_node
+                    tree.set_parent()
+                    tree.set_level(1)
+                    any_tree = any_tree_node
+                    for pre, fill, node in RenderTree(any_tree):
                         print("%s%s" % (pre, node.name))
-            else:
+                    tree.print_tree()
+                    print("Accept")
+                    return True
+                elif action[0] == "S":
+                    stack.append(int(action[1:]))
+                    string.append(input[i].type)
+                    tree.append(Tree(input[i].type))
+                    any_tree.append(Node(input[i].type))
+                    i += 1
+                elif action[0] == "R":
+                    rule_index = int(action[1:])
+                    if self.rule[rule_index][1][0] != "ϵ":
+                        for j in range(len(self.rule[rule_index][1])):
+                            string.pop()
+                            stack.pop()
+                        tree_node = Tree(self.rule[rule_index][0])
+                        any_tree_node = Node(self.rule[rule_index][0])
+                        for j in range(len(self.rule[rule_index][1])):
+                            tree_node.children.insert(0, tree.pop())
+                        any_tree_node.children = any_tree[-len(self.rule[rule_index][1]):]
+                        any_tree = any_tree[:-len(self.rule[rule_index][1])]
+                    else:
+                        tree_node = Tree(self.rule[rule_index][0])
+                        any_tree_node = Node(self.rule[rule_index][0])
+
+                    string.append(Token(self.rule[rule_index][0], ""))
+                    tree.append(tree_node)
+                    any_tree.append(any_tree_node)
+                    state = stack[-1]
+                    token = string[-1].type
+                    stack.append(self.table[state]["GOTO"][token])
+                    for j in any_tree:
+                        for pre, fill, node in RenderTree(j):
+                            print("%s%s" % (pre, node.name))
+                else:
+                    print("Reject")
+                    for i in range(len(string)):
+                        print(string[i].type, end=" ")
+                    return False
+            except:
+                print("Reject")
+                index = 0
+                print()
+                if additional != None:
+                    for j in range(len(input)):
+                        print(input[j].type, end=" ")
+                    for j in range(i):
+                        index += len(input[j].type) + 1
+                    print()
+                    print(" "*index, end = "")
+                    print("^"*len(input[i].type))
+                    print("Syntax Error: Invalid Syntax at line \""+ input[i].type+"\"")
+                else:
+                    index = i
+                    print(index)
+                    finder = 0
+                    sum = 0
+                    for i in range(len(additional)):
+                        for j in range(len(additional[i])):
+                            if finder == index:
+                                print("Syntax Error: Invalid Syntax at line ", i+1)
+                                print("".join(additional[i]))
+                                print(" "*index, end = "")
+                                print("^"*len(additional[i][j]))
+                                break
+                            finder += 1
+                        if finder == index:
+                            break
+                        sum += len([i for i in additional[i] if "    " not in i]) + 1
+                    print(sum)
+                    print()
+
+                            
                 return False
 
             
@@ -112,8 +151,8 @@ rule = [
     ["STMT", ['ASSIGN', 'semi']],
     ["STMT", ['if', 'lparen', 'COND', 'rparen', 'lbrace', 'BLOCK', 'rbrace', 'ELSE']],
     ["STMT", ['while', 'lparen', 'COND', 'rparen', 'lbrace', 'BLOCK', 'rbrace']],
-    ["COND", ['COND1', 'comp', 'COND']],
-    ["COND1", ['boolstr']],
+    ["COND", ['boolstr ', 'comp', 'COND']],
+    ["COND", ['boolstr']],
     ["ELSE", ['else', 'lbrace', 'BLOCK', 'rbrace']],
     ["ELSE", ['ϵ']],
     ["RETURN", ['return', 'RHS', 'semi']]
@@ -169,34 +208,33 @@ table = [
     {"ACTION":{"id":"S23","literal":"S17","character":"S18","boolstr":"S19","lparen":"S22","num":"S24"}, "GOTO":{"RHS":54,"EXPR":16,"EXPR1":20,"EXPR2":21}},
     {"ACTION":{"rbrace":"R23","return":"R23"}, "GOTO":{}},
     {"ACTION":{"vtype":"R26","id":"R26","rbrace":"R26","if":"R26","while":"R26","return":"R26"}, "GOTO":{}},
-    {"ACTION":{"boolstr":"S57"}, "GOTO":{"COND":55,"COND1":56}},
-    {"ACTION":{"boolstr":"S57"}, "GOTO":{"COND":58,"COND1":56}},
+    {"ACTION":{"boolstr":"S56"}, "GOTO":{"COND":55}},
+    {"ACTION":{"boolstr":"S56"}, "GOTO":{"COND":57}},
     {"ACTION":{"semi":"S9","assign":"S11"}, "GOTO":{}},
-    {"ACTION":{"rparen":"R22","comma":"S32"}, "GOTO":{"MOREARGS":59}},
+    {"ACTION":{"rparen":"R22","comma":"S32"}, "GOTO":{"MOREARGS":58}},
     {"ACTION":{"vtype":"R18","$":"R18"}, "GOTO":{}},
-    {"ACTION":{"semi":"S60"}, "GOTO":{}},
-    {"ACTION":{"rparen":"S61"}, "GOTO":{}},
-    {"ACTION":{"comp":"S62"}, "GOTO":{}},
-    {"ACTION":{"comp":"R30"}, "GOTO":{}},
-    {"ACTION":{"rparen":"S63"}, "GOTO":{}},
+    {"ACTION":{"semi":"S59"}, "GOTO":{}},
+    {"ACTION":{"rparen":"S60"}, "GOTO":{}},
+    {"ACTION":{"rparen":"R30","comp":"S61"}, "GOTO":{}},
+    {"ACTION":{"rparen":"S62"}, "GOTO":{}},
     {"ACTION":{"rparen":"R21"}, "GOTO":{}},
     {"ACTION":{"rbrace":"R33"}, "GOTO":{}},
-    {"ACTION":{"lbrace":"S64"}, "GOTO":{}},
-    {"ACTION":{"boolstr":"S57"}, "GOTO":{"COND":65,"COND1":56}},
-    {"ACTION":{"lbrace":"S66"}, "GOTO":{}},
-    {"ACTION":{"vtype":"S42","id":"S43","rbrace":"R24","if":"S40","while":"S41","return":"R24"}, "GOTO":{"VDECL":38,"ASSIGN":39,"BLOCK":67,"STMT":37}},
+    {"ACTION":{"lbrace":"S63"}, "GOTO":{}},
+    {"ACTION":{"boolstr":"S56"}, "GOTO":{"COND":64}},
+    {"ACTION":{"lbrace":"S65"}, "GOTO":{}},
+    {"ACTION":{"vtype":"S42","id":"S43","rbrace":"R24","if":"S40","while":"S41","return":"R24"}, "GOTO":{"VDECL":38,"ASSIGN":39,"BLOCK":66,"STMT":37}},
     {"ACTION":{"rparen":"R29"}, "GOTO":{}},
-    {"ACTION":{"vtype":"S42","id":"S43","rbrace":"R24","if":"S40","while":"S41","return":"R24"}, "GOTO":{"VDECL":38,"ASSIGN":39,"BLOCK":68,"STMT":37}},
+    {"ACTION":{"vtype":"S42","id":"S43","rbrace":"R24","if":"S40","while":"S41","return":"R24"}, "GOTO":{"VDECL":38,"ASSIGN":39,"BLOCK":67,"STMT":37}},
+    {"ACTION":{"rbrace":"S68"}, "GOTO":{}},
     {"ACTION":{"rbrace":"S69"}, "GOTO":{}},
-    {"ACTION":{"rbrace":"S70"}, "GOTO":{}},
-    {"ACTION":{"vtype":"R32","id":"R32","rbrace":"R32","if":"R32","while":"R32","else":"S72","return":"R32"}, "GOTO":{"ELSE":71}},
+    {"ACTION":{"vtype":"R32","id":"R32","rbrace":"R32","if":"R32","while":"R32","else":"S71","return":"R32"}, "GOTO":{"ELSE":70}},
     {"ACTION":{"vtype":"R28","id":"R28","rbrace":"R28","if":"R28","while":"R28","return":"R28"}, "GOTO":{}},
     {"ACTION":{"vtype":"R27","id":"R27","rbrace":"R27","if":"R27","while":"R27","return":"R27"}, "GOTO":{}},
-    {"ACTION":{"lbrace":"S73"}, "GOTO":{}},
-    {"ACTION":{"vtype":"S42","id":"S43","rbrace":"R24","if":"S40","while":"S41","return":"R24"}, "GOTO":{"VDECL":38,"ASSIGN":39,"BLOCK":74,"STMT":37}},
-    {"ACTION":{"rbrace":"S75"}, "GOTO":{}},
+    {"ACTION":{"lbrace":"S72"}, "GOTO":{}},
+    {"ACTION":{"vtype":"S42","id":"S43","rbrace":"R24","if":"S40","while":"S41","return":"R24"}, "GOTO":{"VDECL":38,"ASSIGN":39,"BLOCK":73,"STMT":37}},
+    {"ACTION":{"rbrace":"S74"}, "GOTO":{}},
     {"ACTION":{"vtype":"R31","id":"R31","rbrace":"R31","if":"R31","while":"R31","return":"R31"}, "GOTO":{}}
-]
+    ]
 
 if __name__ == "__main__":
     import main

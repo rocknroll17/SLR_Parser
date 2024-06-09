@@ -8,20 +8,21 @@ value = df.iat[1, 0]
 print(value)
 action = []
 goto = []
-for i in range(1, 150):
+for i in range(1, 76):
     if pd.isna(df.iat[i, 0]):
         break
     value = int(df.iat[i, 0])
+    print(value)
     action_row = []
     goto_row = []
-    for j in range(1, 23):
+    for j in range(1, 22):
         key = df.iat[0, j]
         value = df.iat[i, j]
         if pd.isna(value):
             continue
         value = value.replace("s", "S").replace("r", "R").replace("acc", "ACC")
         action_row.append((key, value))
-    for j in range(23, 39):
+    for j in range(22, 38):
         key = df.iat[0, j]
         value = df.iat[i, j]
         if pd.isna(value):
