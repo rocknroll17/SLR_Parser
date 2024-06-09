@@ -79,8 +79,7 @@ class SLRParser:
                             print("%s%s" % (pre, node.name))
                 else:
                     print("Reject")
-                    for i in range(len(string)):
-                        print(string[i].type, end=" ")
+                    print("Invalid Rule")
                     return False
             except:
                 print("Reject")
