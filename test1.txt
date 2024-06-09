@@ -1,0 +1,1 @@
+vtype id lparen vtype id comma vtype id comma vtype id rparen lbrace while lparen boolstr comp boolstr rparen lbrace id assign id addsub num semi id assign id addsub num semi rbrace return id semi rbrace

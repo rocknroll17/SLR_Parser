@@ -1,0 +1,7 @@
+char function(int a, int b, char c){
+    while(true && true){
+    a = a+1;
+    b = b-1;
+    }
+    return c;
+    }
