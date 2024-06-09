@@ -74,9 +74,6 @@ class SLRParser:
                     state = stack[-1]
                     token = string[-1].type
                     stack.append(self.table[state]["GOTO"][token])
-                    for j in any_tree:
-                        for pre, fill, node in RenderTree(j):
-                            print("%s%s" % (pre, node.name))
                 else:
                     print("Reject")
                     print("Invalid Rule")
@@ -114,7 +111,6 @@ class SLRParser:
             
 
 rule = [
-
     ["S", ["CODE"]],
     ["CODE", ['VDECL', 'CODE']],
     ["CODE", ['FDECL', 'CODE']],
@@ -230,4 +226,4 @@ table = [
     ]
 
 if __name__ == "__main__":
-    import main
+    import syntax_analyzer
