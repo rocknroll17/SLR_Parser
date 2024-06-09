@@ -1,3 +1,4 @@
+#This code is used to convert the tokens to the token objects.
 from tokenizer import Token, VALUE, TYPE
 class Token_parser:
     def parse(tokens):

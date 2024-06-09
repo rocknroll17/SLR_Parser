@@ -1,3 +1,4 @@
+#This code is used to convert the rules of the syntax analyzer to the python code format.
 rule = [
     ["CODE", "VDECL CODE"],
     ["CODE", "FDECL CODE"],
@@ -41,6 +42,6 @@ for left, right in rule:
     formatted_rules.append(right_str)
 
 
-
+#Make rules to python format codes
 final_output = '[' + ',\n'.join(formatted_rules) + ']'
 print(final_output)

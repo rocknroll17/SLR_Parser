@@ -62,19 +62,21 @@ class Lexical_analyzer:
             kind = current_token_match.lastgroup
             value = current_token_match.group(kind)
             
-            if kind == 'NEWLINE':
+            if kind == 'NEWLINE':#If new line, increase line number
                 line_start = current_token_match.end()
                 line_num += 1
-            elif kind == 'SKIP':
+            elif kind == 'SKIP':#If space or tab, pass
                 pass
-            elif kind == 'MISMATCH':
+            elif kind == 'MISMATCH':#If mismatch, raise error
                 raise RuntimeError(f'{value!r} unexpected on line {line_num}')
-            else:
+            else:#If token, append to tokens
                 if kind != 'SKIP' and kind != 'NEWLINE':
                     column = current_token_match.start() - line_start
                     tokens.append(Token(kind, value))
+            #Append recognized code to list
             recognized_code_list.append(value)
             current_token_match = get_token(code, current_token_match.end())
+        #Split recognized code list by new line for error handling at syntax analysis
         code_list = []
         temp = []
         for i in range(len(recognized_code_list)):

@@ -1,3 +1,4 @@
+#Description: Token class for the tokenizer
 TYPE = 'TYPE'
 VALUE = 'VALUE'
 
