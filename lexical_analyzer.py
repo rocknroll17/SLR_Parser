@@ -77,7 +77,9 @@ class Lexical_analyzer:
         code_list = []
         temp = []
         for i in range(len(recognized_code_list)):
-            if recognized_code_list[i] != "\n":
+            if recognized_code_list[i] == " " or recognized_code_list[i] == "\t" or recognized_code_list[i] == "":
+                pass
+            elif recognized_code_list[i] != "\n":
                 temp.append(recognized_code_list[i])
             else:
                 code_list.append(temp)

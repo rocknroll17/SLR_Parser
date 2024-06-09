@@ -86,7 +86,7 @@ class SLRParser:
                 print("Reject")
                 index = 0
                 print()
-                if additional != None:
+                if additional == None:
                     for j in range(len(input)):
                         print(input[j].type, end=" ")
                     for j in range(i):
@@ -97,25 +97,19 @@ class SLRParser:
                     print("Syntax Error: Invalid Syntax at line \""+ input[i].type+"\"")
                 else:
                     index = i
-                    print(index)
                     finder = 0
                     sum = 0
                     for i in range(len(additional)):
-                        for j in range(len(additional[i])):
-                            if finder == index:
-                                print("Syntax Error: Invalid Syntax at line ", i+1)
-                                print("".join(additional[i]))
-                                print(" "*index, end = "")
-                                print("^"*len(additional[i][j]))
-                                break
-                            finder += 1
-                        if finder == index:
+                        sum += len(additional[i])
+                        if sum >= index:
+                            finder = i
+                            sum -= len(additional[i])
                             break
-                        sum += len([i for i in additional[i] if "    " not in i]) + 1
-                    print(sum)
-                    print()
 
-                            
+                    print(" ".join(additional[finder]))
+                    print(" "*(len(" ".join(additional[finder][:index-sum]))+1), end = "")
+                    print("^"*len(input[index].value))
+                    print("\nSyntax Error: Invalid Syntax")
                 return False
 
             

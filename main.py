@@ -9,7 +9,7 @@ int a() {
     }
 '''
 
-token = "vtype id assign num semi vtype id lparen rparen lbrace vtype id assign character semi return num semi rbrace"
+token = "vtype id assign num semi vtype id lparen rparen lbrace vtype id assign character semi return num semi vtype rbrace"
 mode = int(input("Modes\n1. Token\n2. Code\nEnter mode: "))
 if mode == 1:
     #token = input("Enter the tokens: ")
@@ -26,7 +26,20 @@ else:
     code = "\n".join(lines)
 
     tokens, code_list = lexical_analyzer.Lexical_analyzer().tokenize(code)
-print(code_list)
+    token_list = []
+    temp = []
+    index = 0
+    print([i.value for i in tokens])
+    print(code_list)
+    """for i in range(len(code_list)):
+        for j in range(len(code_list[i])):
+            if code_list[i][j] == "\n" or code_list[i][j] == " " or code_list[i][j] == "\t" or code_list[i][j] == "":
+                token_list.append(temp)
+                temp = []
+            elif code_list[i][j] == tokens[index].value:
+                temp.append(tokens[index])
+                index += 1"""
+print(tokens)
 for token in tokens:
     print(token)
 parser = SLRParser()
